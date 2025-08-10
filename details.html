@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelEase - Plan Your Trip</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<section class="details">
+    <div class="overlay"></div>
+    <div class="form-container">
+        <h2>Plan Your Trip</h2>
+        <form id="tripForm" class="form-card">
+            <label>Number of Members:</label>
+            <input type="number" id="members" min="1" placeholder="e.g. 4" required>
+
+            <label>Destination:</label>
+            <input type="text" id="destination" placeholder="Search your destination..." required>
+
+            <label>Travel Date:</label>
+            <input type="date" id="date" required>
+
+            <button type="submit" class="btn">Search Places</button>
+        </form>
+    </div>
+</section>
+
+<script>
+document.getElementById('tripForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    let dest = document.getElementById('destination').value.trim();
+    if(dest) {
+        window.location.href = "results.html?place=" + encodeURIComponent(dest);
+    }
+});
+</script>
+
+</body>
+</html>
