@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelEase - Places to Visit</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<section class="results">
+    <div class="overlay"></div>
+    <div class="results-container">
+        <h2>Places to Visit in <span id="placeName"></span></h2>
+        <ul id="placesList" class="places-grid"></ul>
+    </div>
+</section>
+
+<script>
+const apiKey = "5ae2e3f221c38a28845f05b6735da8ab66cc05363212fb535ddd304c"; // Replace with your API key
+const city = new URLSearchParams(window.location.search).get('place');
+
+// Set city name in heading
+document.getElementById('placeName').textContent = city;
+
+async function getPlaces() {
+    try {
+        // 1️⃣ Get coordinates of the city
+        const geoResp = await fetch(`https://api.opentripmap.com/0.1/en/places/geoname?name=${encodeURIComponent(city)}&apikey=${apiKey}`);
+        const geoData = await geoResp.json();
+
+        if (!geoData.lat || !geoData.lon) {
+            document.getElementById('placesList').innerHTML = "<li>City not found.</li>";
+            return;
+        }
+
+        // 2️⃣ Get nearby attractions
+        const placesResp = await fetch(`https://api.opentripmap.com/0.1/en/places/radius?radius=5000&lon=${geoData.lon}&lat=${geoData.lat}&rate=2&limit=10&apikey=${apiKey}`);
+        const placesData = await placesResp.json();
+
+        const placesList = document.getElementById('placesList');
+        placesList.innerHTML = "";
+
+        if (!placesData.features || placesData.features.length === 0) {
+            placesList.innerHTML = "<li>No attractions found.</li>";
+            return;
+        }
+
+        // 3️⃣ Display each place
+        placesData.features.forEach(place => {
+            const name = place.properties.name || "Unknown Place";
+            const xid = place.properties.xid;
+
+            const li = document.createElement('li');
+            li.innerHTML = `<a href="https://opentripmap.com/en/card/${xid}" target="_blank">${name}</a>`;
+            placesList.appendChild(li);
+        });
+
+    } catch (error) {
+        console.error(error);
+        document.getElementById('placesList').innerHTML = "<li>Error fetching attractions.</li>";
+    }
+}
+
+// Run function
+getPlaces();
+</script>
+
+</body>
+</html>
